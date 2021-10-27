@@ -1,0 +1,27 @@
+version: '1'
+services:
+  redis-internal: # 服务名称
+    image: redis:6.2.6-bullseye     # 使用的镜像
+    container_name: redis                     # 容器名称
+#    environment: # 环境变量
+    volumes:
+      - redis_data:/data                                        # 设置数据存放的目录
+      - /d/docker/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf                                      # 初始化的配置文件
+    hostname: redis-internal                                         # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: -1
+        hard: -1
+    #    restart: always                                                 # 重启策略
+    ports:
+       - 6379:6379                                                   # http端口
+
+#    networks:
+#      t:
+#        ipv4_address: 172.20.0.30
+
+
+volumes: # 顶级volumes
+  redis_data:
+    driver: local                                                   # 会生成一个对应的目录和文件
+

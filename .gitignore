@@ -1,0 +1,8 @@
+/back/
+/teamcity_agent/conf/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

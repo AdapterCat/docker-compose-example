@@ -1,0 +1,32 @@
+# docker-compose 自用常用工具脚本
+#### 介绍
+docker-compose 构建容器脚本
+
+
+#### 使用说明
+
+clone 对应目录的docker-compose 脚本及默认配置文件
+
+进入脚本目录执行
+
+
+```
+ docker-cmpose up -d
+```
+
+
+例:
+```
+$ cd  ../clickhouse
+tree
+├─clickhouse
+│  └─conf
+└─docker-compose.yml
+
+$ docker-cmpose up -d
+
+```
+
+_挂载卷和网络配置均为单一隔离，按需修改调整docker-yml配置_
+
+_使用前需要安装docker-compose_

@@ -1,0 +1,1 @@
+docker run -p 5000:5000 -p 9600:9600 -d --privileged -e xpack.monitoring.elasticsearch.url=http://47.99.200.71:9210    -v /home/software/logstash/logstash.yml:/etc/logstash/logstash.yml  -v /home/software/pipeline:/usr/share/logstash/pipeline/ --name logstash-single  logstash:6.6.1 -f /usr/share/logstash/pipeline/pipeline.conf

@@ -1,0 +1,36 @@
+version: '1'
+services:
+  mysql-internal: # 服务名称
+    image: mysql:8.0.26                                              # 使用的镜像
+    container_name: mysql-internal                                   # 容器名称
+    environment: # 环境变量
+      - MYSQL_ROOT_PASSWORD=123456                                   # 初始化密码
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql                                    # 设置es数据存放的目录
+      - /d/docker/mysql/conf/my.cnf:/etc/mysql/my.cnf                # 映射es容器中的配置文件到宿主机
+    hostname: mysql-internal                                         # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: -1
+        hard: -1
+    #    restart: always                                                 # 重启策略
+    ports:
+     - 3306:3306                                                   # http端口
+
+  adminer-internal:                                                  # 服务名称
+    image: adminer:4.8.1-standalone                                  # 使用的镜像
+    container_name: adminer-internal                                 # 容器名称
+    hostname: adminer-internal                                       # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: -1
+        hard: -1
+    #    restart: always                                                 # 重启策略
+    ports:
+      - 8880:8080                                                    # http端口
+
+
+volumes: # 顶级volumes
+  mysql_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。

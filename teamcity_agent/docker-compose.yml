@@ -1,0 +1,29 @@
+version: '3'
+services:
+  teamcity-agent-local: # 服务名称
+    image: jetbrains/teamcity-agent:2021.1.3-linux     # 使用的镜像
+    container_name: teamcity-agent                     # 容器名称
+    environment: # 环境变量
+      - SERVER_URL=http://108.61.86.203:8111/                                        # teamcity-server URL
+
+    volumes:
+      - teamcity_data:/opt/buildagent                                           # 设置es数据存放的目录
+      - /d/docker/teamcity_agent/conf:/data/teamcity_agent/conf  # 映射es容器中的配置文件到宿主机
+    hostname: teamcityaagent                                         # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: -1
+        hard: -1
+    #    restart: always                                                 # 重启策略
+  #   ports:
+  #     - 9200:9200                                                   # http端口
+  #     - 9300:9300                                                   # es节点直接交互的端口，非http
+#    networks:
+#      t:
+#        ipv4_address: 172.20.0.30
+
+
+volumes: # 顶级volumes
+  teamcity_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。
+

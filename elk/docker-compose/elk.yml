@@ -1,0 +1,158 @@
+version: '3'
+services:
+  elasticsearch0: # 服务名称
+    image: elasticsearch:7.1.1      # 使用的镜像
+    container_name: elasticsearch7.1.1_0                            # 容器名称
+    environment: # 环境变量
+      - node.name=node-0                                            # 节点名称，集群模式下每个节点名称唯一
+      - network.publish_host=172.20.0.30                           # 用于集群内各机器间通信,其他机器访问本机器的es服务
+      - network.host=172.20.0.30                                        # 设置绑定的ip地址，可以是ipv4或ipv6的，默认为0.0.0.0，
+      - http.port=9200
+      - transport.tcp.port=9300
+      - discovery.seed_hosts=172.20.0.10:9301,172.20.0.20:9302,172.20.0.30:9300            # es7.x 之后新增的配置，写入候选主节点的设备地址，在开启服务后可以被选为主节点
+      - cluster.initial_master_nodes=node-0,node-1,node-2                       # es7.x 之后新增的配置，初始化一个新的集群时需要此配置来选举master
+      - cluster.name=es-cluster                                     # 集群名称，相同名称为一个集群
+      #- http.cors.enabled=true                                     # 是否支持跨域，是：true，主要用于head插件访问es，这里设置不起作用，原因未知，我们会将es的配置文件映射到宿主机进行修改
+      #- http.cors.allow-origin="*"                                 # 表示支持所有域名，是：true，这里设置不起作用，原因未知，我们会将es的配置文件映射到宿主机进行修改
+      - bootstrap.memory_lock=true                                  # 内存交换的选项，官网建议为true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"                            # 设置内存大小
+    volumes:
+      - elk_data:/usr/share/elasticsearch/data                                           # 设置es数据存放的目录
+      - /d/docker/container-data/elk/elasticsearch0/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml  # 映射es容器中的配置文件到宿主机
+    hostname: elasticsearch                                         # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: -1
+        hard: -1
+    #    restart: always                                                 # 重启策略
+    ports:
+      - 9200:9200                                                   # http端口
+      - 9300:9300                                                   # es节点直接交互的端口，非http
+    networks:
+      elk:
+        ipv4_address: 172.20.0.30
+
+
+  elasticsearch1: # 服务名称
+    image: elasticsearch:7.1.1      # 使用的镜像
+    container_name: elasticsearch_1   # 容器名称
+    #    restart: on-failure:3               # 失败自动重启策略
+    environment:
+      - node.name=node-1                                           # 节点名称，集群模式下每个节点名称唯一
+      - network.publish_host=172.20.0.10                           # 用于集群内各机器间通信,其他机器访问本机器的es服务
+      - network.host=172.20.0.10                                        # 设置绑定的ip地址，可以是ipv4或ipv6的，默认为0.0.0.0，
+      - http.port=9201
+      - transport.tcp.port=9301
+      - discovery.seed_hosts=172.20.0.10:9301,172.20.0.20:9302,172.20.0.30:9300           # es7.x 之后新增的配置，写入候选主节点的设备地址，在开启服务后可以被选为主节点
+      - cluster.initial_master_nodes=node-0,node-1,node-2     # es7.x 之后新增的配置，初始化一个新的集群时需要此配置来选举master
+      - cluster.name=es-cluster                                     # 集群名称，相同名称为一个集群
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"    # 设置内存
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /d/docker/container-data/elk/elasticsearch1/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml  # 将容器中es的配置文件映射到本地，设置跨域， 否则head插件无法连接该节点
+      - es1_data:/usr/share/elasticsearch/data  # 存放数据的文件， 注意：这里的esdata为 顶级volumes下的一项。
+    ports:
+      - 9201:9201    # http端口
+      - 9301:9301    # es节点直接交互的端口，非http
+    networks:
+      elk:
+        ipv4_address: 172.20.0.10
+
+
+  elasticsearch2: # 服务名称
+    image: elasticsearch:7.1.1      # 使用的镜像
+    container_name: elasticsearch_2   # 容器名称
+    #    restart: on-failure:3               # 失败自动重启策略
+    environment:
+      - node.name=node-2                                           # 节点名称，集群模式下每个节点名称唯一
+      - network.publish_host=172.20.0.20                           # 用于集群内各机器间通信,其他机器访问本机器的es服务
+      - network.host=172.20.0.20                                        # 设置绑定的ip地址，可以是ipv4或ipv6的，默认为0.0.0.0，
+      - http.port=9202
+      - transport.tcp.port=9302
+      - discovery.seed_hosts=172.20.0.10:9301,172.20.0.20:9302,172.20.0.30:9300            # es7.x 之后新增的配置，写入候选主节点的设备地址，在开启服务后可以被选为主节点
+      - cluster.initial_master_nodes=node-0,node-1,node-2                                   # es7.x 之后新增的配置，初始化一个新的集群时需要此配置来选举master
+      - cluster.name=es-cluster                                                             # 集群名称，相同名称为一个集群
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"    # 设置内存
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /d/docker/container-data/elk/elasticsearch1/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml  # 将容器中es的配置文件映射到本地，设置跨域， 否则head插件无法连接该节点
+      - es2_data:/usr/share/elasticsearch/data  # 存放数据的文件， 注意：这里的esdata为 顶级volumes下的一项。
+    ports:
+      - 9202:9202    # http端口
+      - 9302:9302    # es节点直接交互的端口，非http
+    networks:
+      elk:
+        ipv4_address: 172.20.0.20
+
+
+  elasticsearch-head:
+    image: mobz/elasticsearch-head:5
+    container_name: head5
+    hostname: head
+    #    restart: on-failure
+    depends_on:
+      - elasticsearch0                                          # 依赖es服务，会先启动es容器在启动kibana
+      - elasticsearch1
+      - elasticsearch2
+    ports:
+      - 9100:9100         # 这两个端口， 我进行测试其他功能用的，在本文中不用配置问题应该也不大。
+
+    networks:
+      elk:
+        ipv4_address: 172.20.0.2
+  #      --------------------
+  kibana:
+    image: kibana:7.1.1
+    container_name: kibana7.1.1
+    environment:
+      - elasticsearch.hosts=http://172.20.0.30:9200               # 设置连接的es节点
+    hostname: kibana
+    depends_on:
+      - elasticsearch0                                          # 依赖es服务，会先启动es容器在启动kibana
+      - elasticsearch1
+      - elasticsearch2
+    #    restart: on-failure
+    ports:
+      - 5601:5601                                                   # 对外访问端口
+    networks:
+      elk:
+        ipv4_address: 172.20.0.3
+
+  logstash:
+    image: logstash:7.1.1
+    container_name: logstash7.1.1
+    hostname: logstash
+    #    restart: on-failure
+    depends_on:
+      - elasticsearch0                                          # 依赖es服务，会先启动es容器在启动kibana
+      - elasticsearch1
+      - elasticsearch2
+    ports:
+      - 9600:9600         # 这两个端口， 我进行测试其他功能用的，在本文中不用配置问题应该也不大。
+      - 5044:5044
+    volumes:
+      - /d/docker/container-data/elk/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf  # 将容器中es的配置文件映射到本地，设置跨域， 否则head插件无法连接该节点
+    networks:
+      elk:
+        ipv4_address: 172.20.0.4
+volumes: # 顶级volumes
+  elk_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。
+  es1_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。
+  es2_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。
+networks:
+  elk:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1

@@ -1,0 +1,29 @@
+version: '3'
+services:
+  clickhouse-internal:                                      # 服务名称
+    image: yandex/clickhouse-server                         # 使用的镜像
+    container_name: clickhouse-internal                     # 容器名称
+    volumes:
+      - clickhouse_data:/opt/buildagent                                           # 设置es数据存放的目录
+      - /d/docker/clickhouse/conf/config.xml:/etc/clickhouse-server/config.xml    # 映射es容器中的配置文件到宿主机
+      - /d/docker/clickhouse/conf/users.xml:/etc/clickhouse-server/users.xml    # 映射es容器中的配置文件到宿主机
+    hostname: clickhouse-internal                                                      # 服务hostname
+    ulimits: # 是否限制内存
+      memlock:
+        soft: 262144
+        hard: 262144
+    ports:
+      - 8123:8123                                                        # http端口
+#    networks:
+#      t:
+#        ipv4_address: 172.20.0.30
+
+
+volumes: # 顶级volumes
+  clickhouse_data:
+    driver: local                                                   # 会生成一个对应的目录和文件，如何查看，下面有说明。
+
+
+
+
+#  docker run -d --name some-clickhouse-server --ulimit nofile=262144:262144 -v /path/to/your/config.xml:/etc/clickhouse-server/config.xml yandex/clickhouse-server
