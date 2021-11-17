@@ -1,14 +1,22 @@
 version: '3'
 services:
   teamcity-agent-local: # 服务名称
-    image: jetbrains/teamcity-agent:2021.1.3-linux     # 使用的镜像
+    image: jetbrains/teamcity-agent:2021.2    # 使用的镜像
     container_name: teamcity-agent                     # 容器名称
+    user: root
     environment: # 环境变量
       - SERVER_URL=http://108.61.86.203:8111/                                        # teamcity-server URL
-
+      - DOCKER_IN_DOCKER=start
+#    privileged: true
     volumes:
       - teamcity_data:/opt/buildagent                                           # 设置es数据存放的目录
       - /d/docker/teamcity_agent/conf:/data/teamcity_agent/conf  # 映射es容器中的配置文件到宿主机
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/buildagent/work:/opt/buildagent/work
+      - /opt/buildagent/temp:/opt/buildagent/temp
+      - /opt/buildagent/tools:/opt/buildagent/tools
+      - /opt/buildagent/plugins:/opt/buildagent/plugins
+      - /opt/buildagent/system:/opt/buildagent/system
     hostname: teamcityaagent                                         # 服务hostname
     ulimits: # 是否限制内存
       memlock:
