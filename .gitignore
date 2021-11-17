@@ -1,6 +1,7 @@
 /back/
 /teamcity_agent/conf/
-
+*.pub
+yes
 ### IntelliJ IDEA ###
 .idea
 *.iws
