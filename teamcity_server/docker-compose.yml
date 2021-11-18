@@ -1,7 +1,7 @@
 version: '1'
 services:
   teamcity-agent-local: # 服务名称
-    image: "jetbrains/teamcity-server:2021.2-linux"    # 使用的镜像
+    image: jetbrains/teamcity-server:2021.2-linux    # 使用的镜像
     container_name: teamcity-server                     # 容器名称
     user: root
 #    environment: # 环境变量
@@ -16,7 +16,7 @@ services:
         hard: -1
     #    restart: always                                                 # 重启策略
     ports:
-      - "8111:8111"                                                   # http端口
+      - 8111:8111                                                  # http端口
 
 volumes: # 顶级volumes
   teamcity_data:

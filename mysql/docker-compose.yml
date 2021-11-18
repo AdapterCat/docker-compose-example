@@ -9,6 +9,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql                                    # 设置es数据存放的目录
       - /d/docker/mysql/conf/my.cnf:/etc/mysql/my.cnf                # 映射es容器中的配置文件到宿主机
+      - /var/lib/mysql-files:/var/lib/mysql-files
     hostname: mysql-internal                                         # 服务hostname
     ulimits: # 是否限制内存
       memlock:
